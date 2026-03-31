@@ -1,0 +1,52 @@
+{
+    "manifest_version": 3,
+    "name": "ChatGPT Dictation Automator",
+    "version": "4.0",
+    "description": "Automates ChatGPT dictation globally with native shortcuts.",
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "clipboardWrite",
+        "tabs",
+        "storage",
+        "nativeMessaging"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "Dictation Automator Control",
+        "default_icon": {
+            "128": "icon128.png"
+        }
+    },
+    "icons": {
+        "128": "icon128.png"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "commands": {
+        "toggle-dictation": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+Z",
+                "windows": "Ctrl+Shift+Z"
+            },
+            "description": "Start/Stop Dictation"
+        }
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "styles.css"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Dictation Automator</title>
+  <style>
+    body {
+      width: 200px;
+      padding: 15px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f7f7f8;
+      color: #333;
+      text-align: center;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 16px;
+      color: #444;
+    }
+
+    .status {
+      font-size: 12px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .status.active {
+      color: #10a37f;
+    }
+
+    .status.inactive {
+      color: #888;
+    }
+
+    /* Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+      margin-bottom: 10px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked+.slider {
+      background-color: #10a37f;
+    }
+
+    input:focus+.slider {
+      box-shadow: 0 0 1px #10a37f;
+    }
+
+    input:checked+.slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
+
+    .footer {
+      font-size: 10px;
+      color: #666;
+      margin-top: 10px;
+      border-top: 1px solid #ddd;
+      padding-top: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Dictation Control</h2>
+  <div id="statusText" class="status inactive">Inactive</div>
+
+  <label class="switch">
+    <input type="checkbox" id="toggleSwitch">
+    <span class="slider"></span>
+  </label>
+  <div style="margin-top: 15px; font-size: 13px; text-align: left;">
+    <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+      Auto-Paste (Browser)
+      <label class="switch" style="transform: scale(0.7); margin-bottom: 0;">
+        <input type="checkbox" id="autoPasteBrowser">
+        <span class="slider"></span>
+      </label>
+    </label>
+    <label style="display: flex; align-items: center; justify-content: space-between;" title="Requires Native App installed">
+      Auto-Paste (Global Desktop)
+      <label class="switch" style="transform: scale(0.7); margin-bottom: 0;">
+        <input type="checkbox" id="autoPasteGlobal">
+        <span class="slider"></span>
+      </label>
+    </label>
+  </div>
+
+  <div class="footer">
+    Shortcut: <strong>Ctrl + Alt</strong><br>
+    Works on any tab.
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
