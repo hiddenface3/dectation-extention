@@ -3,11 +3,13 @@ import sys
 import json
 import struct
 import time
+import ctypes
 import keyboard  # pip install keyboard
 
 try:
     import win32gui
     import win32con
+    import win32process
     HAS_WIN32 = True
 except ImportError:
     HAS_WIN32 = False
@@ -41,20 +43,45 @@ def find_window_by_title(title_keyword):
     return found[0]
 
 def focus_window(title_keyword):
-    """Restore and bring a window to the foreground by its title keyword.
-    Uses SetForegroundWindow which works reliably when called from a process
-    that was launched by the current foreground process (i.e., the browser)."""
+    """Force a window to the foreground using AttachThreadInput trick.
+    This bypasses Windows focus-stealing prevention, which blocks a plain
+    SetForegroundWindow call when the caller isn't the foreground process."""
     hwnd = find_window_by_title(title_keyword)
     if not hwnd:
         return False
-    # Restore if minimized, then force to foreground
-    win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
-    win32gui.SetForegroundWindow(hwnd)
-    return True
+    try:
+        # Get foreground window + thread IDs
+        fg_hwnd = win32gui.GetForegroundWindow()
+        fg_thread_id = win32process.GetWindowThreadProcessId(fg_hwnd)[0]
+        my_thread_id = ctypes.windll.kernel32.GetCurrentThreadId()
+
+        # Attach our thread to the foreground thread's input queue.
+        # This grants us foreground rights so SetForegroundWindow succeeds.
+        attached = False
+        if fg_thread_id != my_thread_id:
+            ctypes.windll.user32.AttachThreadInput(my_thread_id, fg_thread_id, True)
+            attached = True
+
+        # Restore if minimized, then bring to front
+        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+        win32gui.BringWindowToTop(hwnd)
+        win32gui.SetForegroundWindow(hwnd)
+
+        if attached:
+            ctypes.windll.user32.AttachThreadInput(my_thread_id, fg_thread_id, False)
+
+        return True
+    except Exception as e:
+        # Fallback: plain restore + focus attempt
+        try:
+            win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+            win32gui.SetForegroundWindow(hwnd)
+            return True
+        except:
+            return False
 
 def minimize_window(title_keyword):
-    """Minimize a window by its title keyword, causing OS to restore focus
-    to the previously active window."""
+    """Minimize a window — OS then restores focus to the previously active window."""
     hwnd = find_window_by_title(title_keyword)
     if not hwnd:
         return False
@@ -65,21 +92,18 @@ if __name__ == '__main__':
     while True:
         try:
             msg = get_message()
-            action     = msg.get('action', 'paste')   # 'focus' | 'paste'
+            action       = msg.get('action', 'paste')
             window_title = msg.get('windowTitle', '')
-            text       = msg.get('text', '')
+            text         = msg.get('text', '')
 
-            # ── FOCUS ACTION ────────────────────────────────────────────────
-            # Called before dictation starts: bring ChatGPT/Grok PWA to front
+            # ── FOCUS: bring the dictation PWA window to the front ───────────
             if action == 'focus':
                 focused = focus_window(window_title)
                 send_message({'status': 'success', 'focused': focused})
 
-            # ── PASTE ACTION (default) ───────────────────────────────────────
-            # Called after dictation ends: minimize source window, Ctrl+V
+            # ── PASTE: minimize window then Ctrl+V ───────────────────────────
             elif action == 'paste' and text:
                 minimized = minimize_window(window_title)
-                # Wait for OS to restore focus to the previously active window
                 time.sleep(0.25 if minimized else 0.4)
                 keyboard.send('ctrl+v')
                 send_message({'status': 'success', 'minimized': minimized})

@@ -69,8 +69,8 @@
         if (message.action === 'START_DICTATION') {
             chatGptStart().then(sendResponse); return true;
         }
-        if (message.action === 'TOGGLE_LOCAL') {
-            (chatGptRecording ? chatGptStop() : chatGptStart()).then(sendResponse); return true;
+        if (message.action === 'STOP_DICTATION') {
+            chatGptStop().then(sendResponse); return true;
         }
     }
 
@@ -145,8 +145,8 @@
         if (message.action === 'START_GROK_DICTATION') {
             grokStart().then(sendResponse); return true;
         }
-        if (message.action === 'TOGGLE_GROK_LOCAL') {
-            (grokRecording ? grokStop() : grokStart()).then(sendResponse); return true;
+        if (message.action === 'STOP_GROK_DICTATION') {
+            grokStop().then(sendResponse); return true;
         }
     }
 
