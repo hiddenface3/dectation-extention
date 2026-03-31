@@ -5,8 +5,10 @@
     if (window.hasRunDictationAutomator) return;
     window.hasRunDictationAutomator = true;
 
-    // --- CHATGPT SELECTORS ---
-    const CHATGPT_SELECTORS = {
+    // ─── SELECTORS ───────────────────────────────────────────────────────────
+
+    const CHATGPT = {
+        WINDOW_TITLE: 'ChatGPT',
         DICTATE_BUTTON_CANDIDATES: [
             'button[aria-label="Dictate button"]',
             'button[aria-label="Dictate"]',
@@ -15,53 +17,40 @@
             'button[aria-label="dictate"]',
             '#thread-bottom > div > div > div > div.pointer-events-auto.relative.z-1.flex.h-\\(--composer-container-height\\,100\\%\\).max-w-full.flex-\\(--composer-container-flex\\,1\\).flex-col > form > div:nth-child(2) > div > div.flex.items-center.gap-2.\\[grid-area\\:trailing\\] > div > span > button',
         ],
-        SUBMIT_DICTATION_BUTTON: 'button[aria-label="Submit dictation"]',
-        INPUT_FIELD: '#prompt-textarea'
+        SUBMIT_BUTTON: 'button[aria-label="Submit dictation"]',
+        TEXT_FIELD: '#prompt-textarea',
     };
 
-    // --- GROK SELECTORS ---
-    const GROK_SELECTORS = {
+    const GROK = {
+        WINDOW_TITLE: 'Grok',
         DICTATE_BUTTON: 'body > div.group\\/sidebar-wrapper.flex.flex-col.h-svh.w-full.has-\\[\\[data-variant\\=inset\\]\\]\\:bg-sidebar.isolate > div > div.flex.w-full.h-full.overflow-hidden.\\@container\\/mainview.relative > div > div > main > div.flex.flex-col.items-center.w-full.h-full.p-2.mx-auto.justify-center.\\@sm\\:p-4.\\@sm\\:gap-9.isolate.mt-16.\\@sm\\:mt-0.overflow-scroll > div > div.absolute.mx-auto.inset-x-0.bottom-0.max-w-breakout.\\@sm\\:relative.flex.flex-col.items-center.w-full.gap-1.\\@sm\\:gap-5.\\@sm\\:bottom-auto.\\@sm\\:inset-x-auto.\\@sm\\:max-w-full > div > div.w-full.mb-3 > form > div > div > div.ps-11.pe-\\[138px\\] > div.flex.absolute.inset-x-0.bottom-0.border-2.border-transparent.max-w-full.p-2.\\@\\[480px\\]\\/input\\:p-2 > div > div.ms-auto.flex.flex-row.items-end.gap-0\\.5 > div.h-10.rounded-full.shrink-0.me-1.relative.flex.items-center.transition-\\[background-color\\,box-shadow\\].duration-150.ease-out.ring-0.ring-transparent > div > button',
         CONFIRM_BUTTON: 'body > div.group\\/sidebar-wrapper.flex.flex-col.h-svh.w-full.has-\\[\\[data-variant\\=inset\\]\\]\\:bg-sidebar.isolate > div > div.flex.w-full.h-full.overflow-hidden.\\@container\\/mainview.relative > div > div > main > div.flex.flex-col.items-center.w-full.h-full.p-2.mx-auto.justify-center.\\@sm\\:p-4.\\@sm\\:gap-9.isolate.mt-16.\\@sm\\:mt-0.overflow-scroll > div > div.absolute.mx-auto.inset-x-0.bottom-0.max-w-breakout.\\@sm\\:relative.flex.flex-col.items-center.w-full.gap-1.\\@sm\\:gap-5.\\@sm\\:bottom-auto.\\@sm\\:inset-x-auto.\\@sm\\:max-w-full > div > div.w-full.mb-3 > form > div > div > div.ps-11.pe-\\[138px\\] > div.flex.absolute.inset-x-0.bottom-0.border-2.border-transparent.max-w-full.p-2.\\@\\[480px\\]\\/input\\:p-2 > div > div.ms-auto.flex.flex-row.items-end.gap-0\\.5 > div.h-10.rounded-full.shrink-0.me-1.relative.flex.items-center.transition-\\[background-color\\,box-shadow\\].duration-150.ease-out.bg-surface-l2.ring-1.ring-inset.ring-border-l2.overflow-hidden > div > button.h-8.w-8.shrink-0.flex.items-center.justify-center.rounded-full.bg-button-filled.text-fg-invert',
-        TEXT_FIELD: 'body > div.group\\/sidebar-wrapper.flex.flex-col.h-svh.w-full.has-\\[\\[data-variant\\=inset\\]\\]\\:bg-sidebar.isolate > div > div.flex.w-full.h-full.overflow-hidden.\\@container\\/mainview.relative > div > div > main > div.flex.flex-col.items-center.w-full.h-full.p-2.mx-auto.justify-center.\\@sm\\:p-4.\\@sm\\:gap-9.isolate.mt-16.\\@sm\\:mt-0.overflow-scroll > div > div.absolute.mx-auto.inset-x-0.bottom-0.max-w-breakout.\\@sm\\:relative.flex.flex-col.items-center.w-full.gap-1.\\@sm\\:gap-5.\\@sm\\:bottom-auto.\\@sm\\:inset-x-auto.\\@sm\\:max-w-full > div > div.w-full.mb-3 > form > div > div > div.ps-11.pe-\\[138px\\] > div.relative.z-10 > div > div > div > p'
+        TEXT_FIELD: 'body > div.group\\/sidebar-wrapper.flex.flex-col.h-svh.w-full.has-\\[\\[data-variant\\=inset\\]\\]\\:bg-sidebar.isolate > div > div.flex.w-full.h-full.overflow-hidden.\\@container\\/mainview.relative > div > div > main > div.flex.flex-col.items-center.w-full.h-full.p-2.mx-auto.justify-center.\\@sm\\:p-4.\\@sm\\:gap-9.isolate.mt-16.\\@sm\\:mt-0.overflow-scroll > div > div.absolute.mx-auto.inset-x-0.bottom-0.max-w-breakout.\\@sm\\:relative.flex.flex-col.items-center.w-full.gap-1.\\@sm\\:gap-5.\\@sm\\:bottom-auto.\\@sm\\:inset-x-auto.\\@sm\\:max-w-full > div > div.w-full.mb-3 > form > div > div > div.ps-11.pe-\\[138px\\] > div.relative.z-10 > div > div > div > p',
     };
 
-    // State
+    // ─── STATE ───────────────────────────────────────────────────────────────
+
     let isExtensionEnabled = true;
-    let isRecording = false;
-    let isGrokRecording = false;
+    let chatGptRecording = false;
+    let grokRecording = false;
 
-    function isChatGPT() {
-        return window.location.hostname.includes('chatgpt.com');
-    }
-
-    function isGrok() {
-        return window.location.hostname.includes('grok.com');
-    }
+    // ─── INIT ────────────────────────────────────────────────────────────────
 
     function init() {
         if (typeof chrome === 'undefined' || !chrome.storage) return;
-
         injectToast();
 
-        // Load state
-        chrome.storage.local.get(['extensionEnabled'], (result) => {
-            isExtensionEnabled = result.extensionEnabled !== false;
+        chrome.storage.local.get(['extensionEnabled'], (r) => {
+            isExtensionEnabled = r.extensionEnabled !== false;
         });
-
         chrome.storage.onChanged.addListener((changes, area) => {
             if (area === 'local' && changes.extensionEnabled) {
                 isExtensionEnabled = changes.extensionEnabled.newValue;
             }
         });
 
-        if (isChatGPT()) {
-            chrome.runtime.onMessage.addListener(handleChatGPTMessage);
-        }
-
-        if (isGrok()) {
-            chrome.runtime.onMessage.addListener(handleGrokMessage);
-        }
+        if (isChatGPT()) chrome.runtime.onMessage.addListener(handleChatGPTMessage);
+        if (isGrok())    chrome.runtime.onMessage.addListener(handleGrokMessage);
     }
 
     if (document.readyState === 'loading') {
@@ -70,256 +59,182 @@
         init();
     }
 
-    // =============================================================
-    //  CHATGPT LOGIC
-    // =============================================================
+    function isChatGPT() { return location.hostname.includes('chatgpt.com'); }
+    function isGrok()    { return location.hostname.includes('grok.com'); }
 
-    function findDictateButton() {
-        for (const sel of CHATGPT_SELECTORS.DICTATE_BUTTON_CANDIDATES) {
-            try {
-                const el = document.querySelector(sel);
-                if (el) return el;
-            } catch(e) { /* invalid selector, skip */ }
-        }
-        // Fallback: find any button containing a mic SVG icon
-        const buttons = document.querySelectorAll('button');
-        for (const btn of buttons) {
-            const svg = btn.querySelector('svg');
-            if (!svg) continue;
-            const use = svg.querySelector('use');
-            const href = use ? (use.getAttribute('href') || use.getAttribute('xlink:href') || '') : '';
-            if (href.toLowerCase().includes('mic') || href.toLowerCase().includes('dictate')) return btn;
-            const label = (btn.getAttribute('aria-label') || '').toLowerCase();
-            if (label.includes('mic') || label.includes('dictate') || label.includes('voice')) return btn;
-        }
-        return null;
-    }
+    // ─── CHATGPT ─────────────────────────────────────────────────────────────
 
     function handleChatGPTMessage(message, sender, sendResponse) {
         if (!isExtensionEnabled) return;
-
         if (message.action === 'START_DICTATION') {
-            performStart().then(sendResponse);
-            return true;
-        } else if (message.action === 'STOP_AND_COPY') {
-            performStopAndCopy().then(sendResponse);
-            return true;
-        } else if (message.action === 'TOGGLE_LOCAL') {
-            if (isRecording) {
-                performStopAndCopy().then(sendResponse);
-            } else {
-                performStart().then(sendResponse);
-            }
-            return true;
+            chatGptStart().then(sendResponse); return true;
+        }
+        if (message.action === 'TOGGLE_LOCAL') {
+            (chatGptRecording ? chatGptStop() : chatGptStart()).then(sendResponse); return true;
         }
     }
 
-    async function performStart() {
-        const el = document.querySelector(CHATGPT_SELECTORS.INPUT_FIELD);
+    async function chatGptStart() {
+        // Clear field before starting
+        const el = document.querySelector(CHATGPT.TEXT_FIELD);
         if (el) {
             if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') el.value = '';
             else el.textContent = '';
             el.dispatchEvent(new Event('input', { bubbles: true }));
         }
-
-        const dictateBtn = await waitForDictateButton(3000);
-        if (dictateBtn) {
-            dictateBtn.click();
-            isRecording = true;
-            showToast('Listening...');
+        const btn = await waitForChatGPTDictateButton(3000);
+        if (btn) {
+            btn.click();
+            chatGptRecording = true;
+            showToast('ChatGPT Listening...');
             return { success: true };
-        } else {
-            showToast('Dictate button not found. (Try reloading ChatGPT)');
-            return { success: false, error: 'Dictate button not found' };
         }
+        showToast('Dictate button not found. (Try reloading ChatGPT)');
+        return { success: false };
     }
 
-    function waitForDictateButton(timeout = 3000) {
+    async function chatGptStop() {
+        chatGptRecording = false;
+        // Click submit dictation button if it appeared
+        const submitBtn = document.querySelector(CHATGPT.SUBMIT_BUTTON);
+        if (submitBtn) submitBtn.click();
+
+        await delay(500);
+        const text = await pollForText(CHATGPT.TEXT_FIELD);
+        if (text) {
+            await copyAndPaste(text, CHATGPT.WINDOW_TITLE);
+            return { success: true, text };
+        }
+        return { success: false, error: 'No text captured from ChatGPT' };
+    }
+
+    function findChatGPTDictateButton() {
+        for (const sel of CHATGPT.DICTATE_BUTTON_CANDIDATES) {
+            try { const el = document.querySelector(sel); if (el) return el; } catch(e) {}
+        }
+        // Fallback: mic icon scan
+        for (const btn of document.querySelectorAll('button')) {
+            const label = (btn.getAttribute('aria-label') || '').toLowerCase();
+            if (label.includes('mic') || label.includes('dictate') || label.includes('voice')) return btn;
+            const svg = btn.querySelector('svg use');
+            if (svg) {
+                const href = (svg.getAttribute('href') || svg.getAttribute('xlink:href') || '').toLowerCase();
+                if (href.includes('mic') || href.includes('dictate')) return btn;
+            }
+        }
+        return null;
+    }
+
+    function waitForChatGPTDictateButton(timeout = 3000) {
         return new Promise((resolve) => {
-            const found = findDictateButton();
+            const found = findChatGPTDictateButton();
             if (found) return resolve(found);
-
-            const observer = new MutationObserver(() => {
-                const btn = findDictateButton();
-                if (btn) {
-                    observer.disconnect();
-                    resolve(btn);
-                }
+            const obs = new MutationObserver(() => {
+                const btn = findChatGPTDictateButton();
+                if (btn) { obs.disconnect(); resolve(btn); }
             });
-            observer.observe(document.body, { childList: true, subtree: true });
-
-            setTimeout(() => {
-                observer.disconnect();
-                resolve(findDictateButton());
-            }, timeout);
+            obs.observe(document.body, { childList: true, subtree: true });
+            setTimeout(() => { obs.disconnect(); resolve(findChatGPTDictateButton()); }, timeout);
         });
     }
 
-    async function performStopAndCopy() {
-        isRecording = false;
-        const submitBtn = document.querySelector(CHATGPT_SELECTORS.SUBMIT_DICTATION_BUTTON);
-        if (submitBtn) submitBtn.click();
-
-        const text = await waitForText(CHATGPT_SELECTORS.INPUT_FIELD);
-        if (text) {
-            await copyToClipboard(text);
-            return { success: true, text };
-        } else {
-            return { success: false, error: 'No text generated' };
-        }
-    }
-
-    // =============================================================
-    //  GROK LOGIC
-    // =============================================================
+    // ─── GROK ────────────────────────────────────────────────────────────────
 
     function handleGrokMessage(message, sender, sendResponse) {
         if (!isExtensionEnabled) return;
-
         if (message.action === 'START_GROK_DICTATION') {
-            performGrokStart().then(sendResponse);
-            return true;
-        } else if (message.action === 'TOGGLE_GROK_LOCAL') {
-            if (isGrokRecording) {
-                performGrokStopAndCopy().then(sendResponse);
-            } else {
-                performGrokStart().then(sendResponse);
-            }
-            return true;
+            grokStart().then(sendResponse); return true;
+        }
+        if (message.action === 'TOGGLE_GROK_LOCAL') {
+            (grokRecording ? grokStop() : grokStart()).then(sendResponse); return true;
         }
     }
 
-    async function performGrokStart() {
-        // Clear the text field first if it has content
-        const textEl = document.querySelector(GROK_SELECTORS.TEXT_FIELD);
-        if (textEl) {
-            textEl.textContent = '';
-            textEl.dispatchEvent(new Event('input', { bubbles: true }));
-        }
+    async function grokStart() {
+        const el = document.querySelector(GROK.TEXT_FIELD);
+        if (el) { el.textContent = ''; el.dispatchEvent(new Event('input', { bubbles: true })); }
 
-        // Wait for the dictation button to appear (Grok page might still be loading)
-        const dictateBtn = await waitForElement(GROK_SELECTORS.DICTATE_BUTTON, 5000);
-        if (dictateBtn) {
-            dictateBtn.click();
-            isGrokRecording = true;
+        const btn = await waitForElement(GROK.DICTATE_BUTTON, 5000);
+        if (btn) {
+            btn.click();
+            grokRecording = true;
             showToast('Grok Listening...');
             return { success: true };
-        } else {
-            showToast('Grok dictation button not found. (Try reloading Grok)');
-            return { success: false, error: 'Grok dictation button not found' };
         }
+        showToast('Grok dictation button not found. (Try reloading Grok)');
+        return { success: false };
     }
 
-    async function performGrokStopAndCopy() {
-        isGrokRecording = false;
-
-        // Click the confirm/OK button
-        const confirmBtn = document.querySelector(GROK_SELECTORS.CONFIRM_BUTTON);
+    async function grokStop() {
+        grokRecording = false;
+        const confirmBtn = document.querySelector(GROK.CONFIRM_BUTTON);
         if (confirmBtn) {
             confirmBtn.click();
         } else {
-            showToast('Grok confirm button not found, trying to read text anyway...');
+            showToast('Confirm button not found — reading text anyway...');
         }
-
-        // Wait a moment for the text to settle after clicking confirm
-        await new Promise(r => setTimeout(r, 700));
-
-        const text = await waitForGrokText();
+        await delay(700);
+        const text = await pollForGrokText();
         if (text) {
-            await copyToClipboardGrok(text);
+            await copyAndPaste(text, GROK.WINDOW_TITLE);
             return { success: true, text };
-        } else {
-            return { success: false, error: 'No text captured from Grok' };
+        }
+        return { success: false, error: 'No text captured from Grok' };
+    }
+
+    async function pollForGrokText() {
+        for (let i = 0; i < 20; i++) {
+            await delay(500);
+            const el = document.querySelector(GROK.TEXT_FIELD);
+            const text = el ? (el.innerText || el.textContent || '').trim() : '';
+            if (text.length > 0) return text;
+        }
+        return null;
+    }
+
+    // ─── SHARED HELPERS ──────────────────────────────────────────────────────
+
+    /**
+     * Copy text to clipboard and signal background to:
+     * 1. Find the PWA window by windowTitle and minimize it
+     * 2. Wait ~250ms for OS to restore focus to previous window
+     * 3. Send Ctrl+V at OS level → pastes into any app or browser tab
+     */
+    async function copyAndPaste(text, windowTitle) {
+        try {
+            await navigator.clipboard.writeText(text);
+            showToast('Copied! Pasting...');
+            chrome.runtime.sendMessage({ action: 'TEXT_COPIED', text, windowTitle });
+        } catch (err) {
+            showToast('Copy failed.');
         }
     }
 
-    async function waitForGrokText() {
-        let attempts = 0;
-        return new Promise((resolve) => {
-            const intv = setInterval(() => {
-                attempts++;
-                const el = document.querySelector(GROK_SELECTORS.TEXT_FIELD);
-                const text = el ? (el.innerText || el.textContent) : null;
-                if (text && text.trim().length > 0) {
-                    clearInterval(intv);
-                    resolve(text.trim());
-                } else if (attempts > 20) {
-                    clearInterval(intv);
-                    resolve(null);
-                }
-            }, 500);
-        });
+    async function pollForText(selector) {
+        for (let i = 0; i < 20; i++) {
+            await delay(500);
+            const el = document.querySelector(selector);
+            const text = el ? (el.innerText || el.value || el.textContent || '').trim() : '';
+            if (text.length > 0) return text;
+        }
+        return null;
     }
-
-    // =============================================================
-    //  SHARED HELPERS
-    // =============================================================
 
     function waitForElement(selector, timeout = 2000) {
         return new Promise((resolve) => {
-            try {
-                if (document.querySelector(selector)) {
-                    return resolve(document.querySelector(selector));
-                }
-            } catch(e) {}
-
-            const observer = new MutationObserver(() => {
-                try {
-                    const el = document.querySelector(selector);
-                    if (el) {
-                        resolve(el);
-                        observer.disconnect();
-                    }
-                } catch(e) {}
+            try { const el = document.querySelector(selector); if (el) return resolve(el); } catch(e) {}
+            const obs = new MutationObserver(() => {
+                try { const el = document.querySelector(selector); if (el) { obs.disconnect(); resolve(el); } } catch(e) {}
             });
-
-            observer.observe(document.body, { childList: true, subtree: true });
-
+            obs.observe(document.body, { childList: true, subtree: true });
             setTimeout(() => {
-                observer.disconnect();
+                obs.disconnect();
                 try { resolve(document.querySelector(selector)); } catch(e) { resolve(null); }
             }, timeout);
         });
     }
 
-    async function waitForText(inputSelector) {
-        let attempts = 0;
-        return new Promise((resolve) => {
-            const intv = setInterval(() => {
-                attempts++;
-                const el = document.querySelector(inputSelector);
-                const text = el ? (el.innerText || el.value || el.textContent) : null;
-                if (text && text.trim().length > 0) {
-                    clearInterval(intv);
-                    resolve(text);
-                } else if (attempts > 20) {
-                    clearInterval(intv);
-                    resolve(null);
-                }
-            }, 500);
-        });
-    }
-
-    async function copyToClipboard(text) {
-        try {
-            await navigator.clipboard.writeText(text);
-            showToast('Copied to Clipboard!');
-            chrome.runtime.sendMessage({ action: 'TEXT_COPIED', text: text });
-        } catch (err) {
-            showToast('Copy Failed.');
-        }
-    }
-
-    // Grok-specific copy: triggers the minimize-PWA + OS Ctrl+V flow in background.js
-    async function copyToClipboardGrok(text) {
-        try {
-            await navigator.clipboard.writeText(text);
-            showToast('Copied! Pasting...');
-            chrome.runtime.sendMessage({ action: 'TEXT_COPIED_GROK', text: text });
-        } catch (err) {
-            showToast('Copy Failed.');
-        }
-    }
+    function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
     function injectToast() {
         if (document.getElementById('dictation-toast')) return;
@@ -330,11 +245,7 @@
 
     function showToast(msg) {
         const t = document.getElementById('dictation-toast');
-        if (t) {
-            t.textContent = msg;
-            t.className = 'show';
-            setTimeout(() => t.className = '', 3000);
-        }
+        if (t) { t.textContent = msg; t.className = 'show'; setTimeout(() => t.className = '', 3000); }
     }
 
 })();

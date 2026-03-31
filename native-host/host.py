@@ -5,7 +5,6 @@ import struct
 import time
 import keyboard  # pip install keyboard
 
-# Try to import pywin32 for window management
 try:
     import win32gui
     import win32con
@@ -28,26 +27,28 @@ def send_message(message_dict):
     sys.stdout.buffer.write(encoded_content)
     sys.stdout.buffer.flush()
 
-def find_and_minimize_grok():
-    """Find the Grok PWA window and minimize it so the previous window regains focus."""
-    if not HAS_WIN32:
+def find_and_minimize_window(title_keyword):
+    """Find a visible window whose title contains title_keyword and minimize it.
+    This causes Windows to restore focus to the previously active window."""
+    if not HAS_WIN32 or not title_keyword:
         return False
 
-    grok_hwnd = None
+    found_hwnd = None
 
-    def enum_windows_callback(hwnd, _):
-        nonlocal grok_hwnd
+    def enum_callback(hwnd, _):
+        nonlocal found_hwnd
+        if found_hwnd:
+            return  # already found one
         if not win32gui.IsWindowVisible(hwnd):
             return
         title = win32gui.GetWindowText(hwnd)
-        # Match the Grok PWA window - it typically shows "Grok" in the title
-        if 'grok' in title.lower() and grok_hwnd is None:
-            grok_hwnd = hwnd
+        if title_keyword.lower() in title.lower():
+            found_hwnd = hwnd
 
-    win32gui.EnumWindows(enum_windows_callback, None)
+    win32gui.EnumWindows(enum_callback, None)
 
-    if grok_hwnd:
-        win32gui.ShowWindow(grok_hwnd, win32con.SW_MINIMIZE)
+    if found_hwnd:
+        win32gui.ShowWindow(found_hwnd, win32con.SW_MINIMIZE)
         return True
     return False
 
@@ -56,28 +57,27 @@ if __name__ == '__main__':
         try:
             msg = get_message()
             text = msg.get('text', '')
-            minimize_grok = msg.get('minimizeGrok', False)
+            # windowTitle: name of the PWA window to minimize before pasting
+            # e.g. "ChatGPT" or "Grok"
+            window_title = msg.get('windowTitle', '')
 
             if text:
-                # Step 1: If requested, minimize the Grok PWA window
-                # This causes Windows to refocus the previously active window
-                if minimize_grok:
-                    minimized = find_and_minimize_grok()
-                else:
-                    minimized = False
+                # Step 1: Minimize the source dictation window (ChatGPT or Grok PWA)
+                # so Windows restores focus to whatever window/app was focused before
+                minimized = find_and_minimize_window(window_title)
 
                 # Step 2: Wait for OS to finish refocusing the previous window
-                # 250ms is enough for Windows to restore focus
-                if minimized:
-                    time.sleep(0.25)
-                else:
-                    # Fallback: still wait a bit so Chrome yields focus
-                    time.sleep(0.5)
+                # 250ms is enough when minimized; 400ms fallback
+                time.sleep(0.25 if minimized else 0.4)
 
-                # Step 3: Send Ctrl+V at OS level — pastes wherever cursor is
+                # Step 3: Ctrl+V at OS level — pastes into wherever the cursor is
                 keyboard.send('ctrl+v')
 
-                send_message({'status': 'success', 'message': 'Pasted successfully', 'minimized': minimized})
+                send_message({
+                    'status': 'success',
+                    'minimized': minimized,
+                    'windowTitle': window_title
+                })
             else:
                 send_message({'status': 'error', 'message': 'No text provided'})
 
