@@ -1,7 +1,7 @@
-﻿{
+{
   "name": "com.dictation.automator",
   "description": "Dictation Automator Native Host",
-  "path": "!DIR:\\=\\\\!install.bat", 
+  "path": "REPLACE_WITH_FULL_PATH_TO\\install.bat",
   "type": "stdio",
   "allowed_origins": [
     "chrome-extension://aoimkohlccmddngccdphkkicoilhgoaj/"

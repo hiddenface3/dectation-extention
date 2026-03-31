@@ -226,7 +226,7 @@
 
         const text = await waitForGrokText();
         if (text) {
-            await copyToClipboard(text);
+            await copyToClipboardGrok(text);
             return { success: true, text };
         } else {
             return { success: false, error: 'No text captured from Grok' };
@@ -305,6 +305,17 @@
             await navigator.clipboard.writeText(text);
             showToast('Copied to Clipboard!');
             chrome.runtime.sendMessage({ action: 'TEXT_COPIED', text: text });
+        } catch (err) {
+            showToast('Copy Failed.');
+        }
+    }
+
+    // Grok-specific copy: triggers the minimize-PWA + OS Ctrl+V flow in background.js
+    async function copyToClipboardGrok(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            showToast('Copied! Pasting...');
+            chrome.runtime.sendMessage({ action: 'TEXT_COPIED_GROK', text: text });
         } catch (err) {
             showToast('Copy Failed.');
         }

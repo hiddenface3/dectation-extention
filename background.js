@@ -33,16 +33,31 @@ chrome.commands.onCommand.addListener(async (command) => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'TEXT_COPIED') {
-        handlePasteLocallyOrGlobally(message.text);
+        handlePasteLocallyOrGlobally(message.text, { fromGrok: false });
+    } else if (message.action === 'TEXT_COPIED_GROK') {
+        handlePasteLocallyOrGlobally(message.text, { fromGrok: true });
     }
 });
 
-async function handlePasteLocallyOrGlobally(text) {
-    const { autoPasteGlobal, autoPasteBrowser, originalTabId } = await chrome.storage.local.get(['autoPasteGlobal', 'autoPasteBrowser', 'originalTabId']);
+async function handlePasteLocallyOrGlobally(text, options = {}) {
+    const { autoPasteGlobal, autoPasteBrowser, originalTabId, grokDictation } = await chrome.storage.local.get(['autoPasteGlobal', 'autoPasteBrowser', 'originalTabId', 'grokDictation']);
+
+    // GROK MODE: Always use native host to minimize Grok PWA and Ctrl+V paste
+    // This works for both desktop apps AND browser tabs since Grok is a separate PWA window
+    if (grokDictation && options.fromGrok) {
+        chrome.runtime.sendNativeMessage('com.dictation.automator', { text: text, minimizeGrok: true }, (response) => {
+            if (chrome.runtime.lastError) {
+                console.error("Native Messaging Error (Grok): ", chrome.runtime.lastError.message);
+            } else {
+                console.log("Grok native host response:", response);
+            }
+        });
+        return;
+    }
 
     if (autoPasteGlobal) {
-        // Send to native python script to simulate Ctrl+V
-        chrome.runtime.sendNativeMessage('com.dictation.automator', { text: text }, (response) => {
+        // ChatGPT mode: Send to native python script to simulate Ctrl+V
+        chrome.runtime.sendNativeMessage('com.dictation.automator', { text: text, minimizeGrok: false }, (response) => {
             if (chrome.runtime.lastError) {
                 console.error("Native Messaging Error: ", chrome.runtime.lastError.message);
             } else {
