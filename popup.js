@@ -2,21 +2,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleSwitch = document.getElementById('toggleSwitch');
     const autoPasteBrowser = document.getElementById('autoPasteBrowser');
     const autoPasteGlobal = document.getElementById('autoPasteGlobal');
+    const grokDictation = document.getElementById('grokDictation');
     const statusText = document.getElementById('statusText');
 
     // 1. Load saved state
-    chrome.storage.local.get(['extensionEnabled', 'autoPasteBrowser', 'autoPasteGlobal'], (result) => {
-        // Default to true if not set
+    chrome.storage.local.get(['extensionEnabled', 'autoPasteBrowser', 'autoPasteGlobal', 'grokDictation'], (result) => {
         const isEnabled = result.extensionEnabled !== false;
-        
+
         toggleSwitch.checked = isEnabled;
         autoPasteBrowser.checked = result.autoPasteBrowser === true;
         autoPasteGlobal.checked = result.autoPasteGlobal === true;
-        
+        grokDictation.checked = result.grokDictation === true;
+
         updateStatusUI(isEnabled);
     });
 
-    // 2. Handle toggle change
+    // 2. Handle toggle changes
     toggleSwitch.addEventListener('change', () => {
         const isEnabled = toggleSwitch.checked;
         chrome.storage.local.set({ extensionEnabled: isEnabled });
@@ -25,11 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     autoPasteBrowser.addEventListener('change', () => {
         chrome.storage.local.set({ autoPasteBrowser: autoPasteBrowser.checked });
-        // Give preference to Global if both are enabled logically in background, but no strict UI preventions yet
     });
 
     autoPasteGlobal.addEventListener('change', () => {
         chrome.storage.local.set({ autoPasteGlobal: autoPasteGlobal.checked });
+    });
+
+    grokDictation.addEventListener('change', () => {
+        chrome.storage.local.set({ grokDictation: grokDictation.checked });
     });
 
     function updateStatusUI(isEnabled) {
