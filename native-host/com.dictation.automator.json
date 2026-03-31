@@ -1,9 +1,9 @@
-{
+﻿{
   "name": "com.dictation.automator",
   "description": "Dictation Automator Native Host",
-  "path": "REPLACE_WITH_FULL_PATH_TO\\install.bat",
+  "path": "D:\\enxtension with anti gravity\\DECTATION - for edge cpy\\DECTATION - for edge cpy date13\\native-host\\install.bat",
   "type": "stdio",
   "allowed_origins": [
-    "chrome-extension://aoimkohlccmddngccdphkkicoilhgoaj/"
+    "chrome-extension://hhifbhhamdemkakklclkgpnebjnpanpb/"
   ]
 }

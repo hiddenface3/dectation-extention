@@ -108,12 +108,19 @@ async function handlePasteLocallyOrGlobally(text, options = {}) {
 // Switch to ChatGPT and start dictation
 async function handleSwitchAndStart(currentTab) {
     const tabs = await chrome.tabs.query({ url: '*://chatgpt.com/*' });
+
+    let chatGptTab;
     if (tabs.length === 0) {
-        console.warn('ChatGPT not found');
+        // Open ChatGPT in a new tab if not already open
+        chatGptTab = await chrome.tabs.create({ url: 'https://chatgpt.com', active: true });
+        // Wait for page to load before sending message
+        setTimeout(() => {
+            chrome.tabs.sendMessage(chatGptTab.id, { action: 'START_DICTATION' });
+        }, 2500);
         return;
     }
 
-    const chatGptTab = tabs[0];
+    chatGptTab = tabs[0];
     if (chatGptTab.windowId !== currentTab.windowId) {
         await chrome.windows.update(chatGptTab.windowId, { focused: true, state: 'normal' });
     }
