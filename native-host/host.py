@@ -27,59 +27,65 @@ def send_message(message_dict):
     sys.stdout.buffer.write(encoded_content)
     sys.stdout.buffer.flush()
 
-def find_and_minimize_window(title_keyword):
-    """Find a visible window whose title contains title_keyword and minimize it.
-    This causes Windows to restore focus to the previously active window."""
+def find_window_by_title(title_keyword):
+    """Return the HWND of the first visible window whose title contains title_keyword."""
     if not HAS_WIN32 or not title_keyword:
+        return None
+    found = [None]
+    def cb(hwnd, _):
+        if found[0]: return
+        if not win32gui.IsWindowVisible(hwnd): return
+        if title_keyword.lower() in win32gui.GetWindowText(hwnd).lower():
+            found[0] = hwnd
+    win32gui.EnumWindows(cb, None)
+    return found[0]
+
+def focus_window(title_keyword):
+    """Restore and bring a window to the foreground by its title keyword.
+    Uses SetForegroundWindow which works reliably when called from a process
+    that was launched by the current foreground process (i.e., the browser)."""
+    hwnd = find_window_by_title(title_keyword)
+    if not hwnd:
         return False
+    # Restore if minimized, then force to foreground
+    win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+    win32gui.SetForegroundWindow(hwnd)
+    return True
 
-    found_hwnd = None
-
-    def enum_callback(hwnd, _):
-        nonlocal found_hwnd
-        if found_hwnd:
-            return  # already found one
-        if not win32gui.IsWindowVisible(hwnd):
-            return
-        title = win32gui.GetWindowText(hwnd)
-        if title_keyword.lower() in title.lower():
-            found_hwnd = hwnd
-
-    win32gui.EnumWindows(enum_callback, None)
-
-    if found_hwnd:
-        win32gui.ShowWindow(found_hwnd, win32con.SW_MINIMIZE)
-        return True
-    return False
+def minimize_window(title_keyword):
+    """Minimize a window by its title keyword, causing OS to restore focus
+    to the previously active window."""
+    hwnd = find_window_by_title(title_keyword)
+    if not hwnd:
+        return False
+    win32gui.ShowWindow(hwnd, win32con.SW_MINIMIZE)
+    return True
 
 if __name__ == '__main__':
     while True:
         try:
             msg = get_message()
-            text = msg.get('text', '')
-            # windowTitle: name of the PWA window to minimize before pasting
-            # e.g. "ChatGPT" or "Grok"
+            action     = msg.get('action', 'paste')   # 'focus' | 'paste'
             window_title = msg.get('windowTitle', '')
+            text       = msg.get('text', '')
 
-            if text:
-                # Step 1: Minimize the source dictation window (ChatGPT or Grok PWA)
-                # so Windows restores focus to whatever window/app was focused before
-                minimized = find_and_minimize_window(window_title)
+            # ── FOCUS ACTION ────────────────────────────────────────────────
+            # Called before dictation starts: bring ChatGPT/Grok PWA to front
+            if action == 'focus':
+                focused = focus_window(window_title)
+                send_message({'status': 'success', 'focused': focused})
 
-                # Step 2: Wait for OS to finish refocusing the previous window
-                # 250ms is enough when minimized; 400ms fallback
+            # ── PASTE ACTION (default) ───────────────────────────────────────
+            # Called after dictation ends: minimize source window, Ctrl+V
+            elif action == 'paste' and text:
+                minimized = minimize_window(window_title)
+                # Wait for OS to restore focus to the previously active window
                 time.sleep(0.25 if minimized else 0.4)
-
-                # Step 3: Ctrl+V at OS level — pastes into wherever the cursor is
                 keyboard.send('ctrl+v')
+                send_message({'status': 'success', 'minimized': minimized})
 
-                send_message({
-                    'status': 'success',
-                    'minimized': minimized,
-                    'windowTitle': window_title
-                })
             else:
-                send_message({'status': 'error', 'message': 'No text provided'})
+                send_message({'status': 'error', 'message': 'Unknown action or missing text'})
 
         except Exception as e:
             send_message({'status': 'error', 'error': str(e)})
