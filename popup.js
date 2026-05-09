@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // ── Settings button ──────────────────────────────────────────────────────
+    document.getElementById('openSettings').addEventListener('click', () => {
+        chrome.tabs.create({ url: chrome.runtime.getURL('settings.html') });
+    });
+
     const toggleSwitch = document.getElementById('toggleSwitch');
     const autoPasteBrowser = document.getElementById('autoPasteBrowser');
     const autoPasteGlobal = document.getElementById('autoPasteGlobal');

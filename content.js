@@ -5,9 +5,10 @@
     if (window.hasRunDictationAutomator) return;
     window.hasRunDictationAutomator = true;
 
-    // ─── SELECTORS ───────────────────────────────────────────────────────────
+    // ─── DEFAULT SELECTORS ────────────────────────────────────────────────────
+    // These are the fallbacks used when no custom selector is saved in settings.
 
-    const CHATGPT = {
+    const CHATGPT_DEFAULTS = {
         WINDOW_TITLE: 'ChatGPT',
         DICTATE_BUTTON_CANDIDATES: [
             'button[aria-label="Dictate button"]',
@@ -21,25 +22,31 @@
         TEXT_FIELD: '#prompt-textarea',
     };
 
-    const GROK = {
+    const GROK_DEFAULTS = {
         WINDOW_TITLE: 'Grok',
         DICTATE_BUTTON: 'body > div.group\\/sidebar-wrapper.flex.flex-col.h-svh.w-full.has-\\[\\[data-variant\\=inset\\]\\]\\:bg-sidebar.isolate > div > div.flex.w-full.h-full.overflow-hidden.\\@container\\/mainview.relative > div > div > main > div.flex.flex-col.items-center.w-full.h-full.p-2.mx-auto.justify-center.\\@sm\\:p-4.\\@sm\\:gap-9.isolate.mt-16.\\@sm\\:mt-0.overflow-scroll > div > div.absolute.mx-auto.inset-x-0.bottom-0.max-w-breakout.\\@sm\\:relative.flex.flex-col.items-center.w-full.gap-1.\\@sm\\:gap-5.\\@sm\\:bottom-auto.\\@sm\\:inset-x-auto.\\@sm\\:max-w-full > div > div.w-full.mb-3 > form > div > div > div.ps-11.pe-\\[138px\\] > div.flex.absolute.inset-x-0.bottom-0.border-2.border-transparent.max-w-full.p-2.\\@\\[480px\\]\\/input\\:p-2 > div > div.ms-auto.flex.flex-row.items-end.gap-0\\.5 > div.h-10.rounded-full.shrink-0.me-1.relative.flex.items-center.transition-\\[background-color\\,box-shadow\\].duration-150.ease-out.ring-0.ring-transparent > div > button',
         CONFIRM_BUTTON: 'body > div.group\\/sidebar-wrapper.flex.flex-col.h-svh.w-full.has-\\[\\[data-variant\\=inset\\]\\]\\:bg-sidebar.isolate > div > div.flex.w-full.h-full.overflow-hidden.\\@container\\/mainview.relative > div > div > main > div.flex.flex-col.items-center.w-full.h-full.p-2.mx-auto.justify-center.\\@sm\\:p-4.\\@sm\\:gap-9.isolate.mt-16.\\@sm\\:mt-0.overflow-scroll > div > div.absolute.mx-auto.inset-x-0.bottom-0.max-w-breakout.\\@sm\\:relative.flex.flex-col.items-center.w-full.gap-1.\\@sm\\:gap-5.\\@sm\\:bottom-auto.\\@sm\\:inset-x-auto.\\@sm\\:max-w-full > div > div.w-full.mb-3 > form > div > div > div.ps-11.pe-\\[138px\\] > div.flex.absolute.inset-x-0.bottom-0.border-2.border-transparent.max-w-full.p-2.\\@\\[480px\\]\\/input\\:p-2 > div > div.ms-auto.flex.flex-row.items-end.gap-0\\.5 > div.h-10.rounded-full.shrink-0.me-1.relative.flex.items-center.transition-\\[background-color\\,box-shadow\\].duration-150.ease-out.bg-surface-l2.ring-1.ring-inset.ring-border-l2.overflow-hidden > div > button.h-8.w-8.shrink-0.flex.items-center.justify-center.rounded-full.bg-button-filled.text-fg-invert',
         TEXT_FIELD: 'body > div.group\\/sidebar-wrapper.flex.flex-col.h-svh.w-full.has-\\[\\[data-variant\\=inset\\]\\]\\:bg-sidebar.isolate > div > div.flex.w-full.h-full.overflow-hidden.\\@container\\/mainview.relative > div > div > main > div.flex.flex-col.items-center.w-full.h-full.p-2.mx-auto.justify-center.\\@sm\\:p-4.\\@sm\\:gap-9.isolate.mt-16.\\@sm\\:mt-0.overflow-scroll > div > div.absolute.mx-auto.inset-x-0.bottom-0.max-w-breakout.\\@sm\\:relative.flex.flex-col.items-center.w-full.gap-1.\\@sm\\:gap-5.\\@sm\\:bottom-auto.\\@sm\\:inset-x-auto.\\@sm\\:max-w-full > div > div.w-full.mb-3 > form > div > div > div.ps-11.pe-\\[138px\\] > div.relative.z-10 > div > div > div > p',
     };
 
-    // ─── STATE ───────────────────────────────────────────────────────────────
+    // ─── ACTIVE SELECTORS (overridden by storage at init) ─────────────────────
+
+    let CHATGPT = Object.assign({}, CHATGPT_DEFAULTS);
+    let GROK    = Object.assign({}, GROK_DEFAULTS);
+
+    // ─── STATE ────────────────────────────────────────────────────────────────
 
     let isExtensionEnabled = true;
     let chatGptRecording = false;
     let grokRecording = false;
 
-    // ─── INIT ────────────────────────────────────────────────────────────────
+    // ─── INIT ─────────────────────────────────────────────────────────────────
 
     function init() {
         if (typeof chrome === 'undefined' || !chrome.storage) return;
         injectToast();
 
+        // Load extension enabled state
         chrome.storage.local.get(['extensionEnabled'], (r) => {
             isExtensionEnabled = r.extensionEnabled !== false;
         });
@@ -47,6 +54,19 @@
             if (area === 'local' && changes.extensionEnabled) {
                 isExtensionEnabled = changes.extensionEnabled.newValue;
             }
+        });
+
+        // Load custom selectors from settings page (override defaults if set)
+        chrome.storage.local.get([
+            'sel_cg_mic', 'sel_cg_submit', 'sel_cg_text',
+            'sel_gk_mic', 'sel_gk_confirm', 'sel_gk_text'
+        ], (r) => {
+            if (r.sel_cg_mic)     CHATGPT.DICTATE_BUTTON_CANDIDATES = [r.sel_cg_mic, ...CHATGPT_DEFAULTS.DICTATE_BUTTON_CANDIDATES];
+            if (r.sel_cg_submit)  CHATGPT.SUBMIT_BUTTON = r.sel_cg_submit;
+            if (r.sel_cg_text)    CHATGPT.TEXT_FIELD    = r.sel_cg_text;
+            if (r.sel_gk_mic)     GROK.DICTATE_BUTTON   = r.sel_gk_mic;
+            if (r.sel_gk_confirm) GROK.CONFIRM_BUTTON   = r.sel_gk_confirm;
+            if (r.sel_gk_text)    GROK.TEXT_FIELD       = r.sel_gk_text;
         });
 
         if (isChatGPT()) chrome.runtime.onMessage.addListener(handleChatGPTMessage);

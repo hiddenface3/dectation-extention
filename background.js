@@ -68,11 +68,11 @@ function nativeMessage(payload) {
 // ─── TAB SWITCHING ───────────────────────────────────────────────────────────
 
 async function handleSwitchAndStart(service) {
-    const isGrok      = service === 'grok';
-    const urlPattern  = isGrok ? '*://grok.com/*'       : '*://chatgpt.com/*';
-    const openUrl     = isGrok ? 'https://grok.com'     : 'https://chatgpt.com';
+    const isGrok = service === 'grok';
+    const urlPattern = isGrok ? '*://grok.com/*' : '*://chatgpt.com/*';
+    const openUrl = isGrok ? 'https://grok.com' : 'https://chatgpt.com';
     const startAction = isGrok ? 'START_GROK_DICTATION' : 'START_DICTATION';
-    const windowTitle = isGrok ? 'Grok'                 : 'ChatGPT';
+    const windowTitle = isGrok ? 'Grok' : 'ChatGPT';
 
     // Save the tab the user was on before switching
     const [currentTab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });

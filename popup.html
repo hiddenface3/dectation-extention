@@ -95,11 +95,31 @@
       border-top: 1px solid #ddd;
       padding-top: 5px;
     }
+
+    .settings-btn {
+      background: none;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px 8px;
+      color: #666;
+      float: right;
+      margin-top: -2px;
+      transition: background .2s, border-color .2s;
+    }
+    .settings-btn:hover {
+      background: #eee;
+      border-color: #aaa;
+    }
   </style>
 </head>
 
 <body>
-  <h2>Dictation Control</h2>
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+    <h2 style="margin:0;">Dictation Control</h2>
+    <button class="settings-btn" id="openSettings" title="Selector Settings">⚙️</button>
+  </div>
   <div id="statusText" class="status inactive">Inactive</div>
 
   <label class="switch">
