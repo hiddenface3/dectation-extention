@@ -23,16 +23,21 @@ chrome.commands.onCommand.addListener(async (command) => {
     if (extensionEnabled === false) return;
 
     const state = await getRecordingState();
-    let service = targetService || (grokDictation ? 'grok' : 'chatgpt');
+
+    const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const activeUrl = activeTab?.url || '';
+
+    let service = targetService;
+    if (!service) {
+        if (activeUrl.includes('chatgpt.com')) service = 'chatgpt';
+        else if (activeUrl.includes('grok.com')) service = 'grok';
+        else if (activeUrl.includes('gemini.google.com')) service = 'gemini';
+        else service = 'active_tab';
+    }
 
     if (state.isRecording) {
         // ── STOP dictation ──────────────────────────────────────────────────
-        let targetTabId = state.activeServiceTab;
-        if (!targetTabId) {
-            const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-            targetTabId = activeTab?.id;
-        }
-
+        let targetTabId = state.activeServiceTab || activeTab?.id;
         if (targetTabId) {
             chrome.tabs.sendMessage(targetTabId, { action: state.currentStopAction }, () => {
                 if (chrome.runtime.lastError) {
@@ -61,12 +66,17 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 // ─── NATIVE HOST ─────────────────────────────────────────────────────────────
 function nativeMessage(payload) {
     return new Promise((resolve) => {
-        chrome.runtime.sendNativeMessage('com.dictation.automator', payload, (response) => {
-            if (chrome.runtime.lastError) {
-                console.warn('[Dictation] Native host:', chrome.runtime.lastError.message);
-            }
-            resolve(response);
-        });
+        try {
+            chrome.runtime.sendNativeMessage('com.dictation.automator', payload, (response) => {
+                if (chrome.runtime.lastError) {
+                    console.warn('[Dictation] Native host warning:', chrome.runtime.lastError.message);
+                }
+                resolve(response || null);
+            });
+        } catch (e) {
+            console.warn('[Dictation] Native host error:', e);
+            resolve(null);
+        }
     });
 }
 
@@ -118,12 +128,6 @@ async function handleSwitchAndStart(service) {
         }
     }
 
-    // Save current active tab before switching
-    const [currentTab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-    if (currentTab) {
-        await chrome.storage.local.set({ originalTabId: currentTab.id });
-    }
-
     const tabs = await chrome.tabs.query({ url: urlPattern });
 
     if (tabs.length === 0) {
@@ -131,23 +135,28 @@ async function handleSwitchAndStart(service) {
         await setRecordingState(true, newTab.id, stopAction);
         setTimeout(() => {
             chrome.tabs.sendMessage(newTab.id, { action: startAction });
-        }, 2500);
+        }, 2000);
         return;
     }
 
     const targetTab = tabs[0];
     await setRecordingState(true, targetTab.id, stopAction);
 
-    await nativeMessage({ action: 'focus', windowTitle });
-    await chrome.windows.update(targetTab.windowId, { focused: true, state: 'normal' });
-    await chrome.tabs.update(targetTab.id, { active: true });
+    // Non-blocking call to native focus
+    nativeMessage({ action: 'focus', windowTitle });
 
-    setTimeout(() => {
-        chrome.tabs.sendMessage(targetTab.id, { action: startAction }, (response) => {
-            if (chrome.runtime.lastError) {
-                console.warn('[Dictation] Start message failed:', chrome.runtime.lastError.message);
-                setRecordingState(false, null, 'STOP_DICTATION');
-            }
-        });
-    }, 700);
+    try {
+        await chrome.windows.update(targetTab.windowId, { focused: true, state: 'normal' });
+        await chrome.tabs.update(targetTab.id, { active: true });
+    } catch (e) {}
+
+    // Send start action to content script
+    chrome.tabs.sendMessage(targetTab.id, { action: startAction }, (response) => {
+        if (chrome.runtime.lastError) {
+            console.warn('[Dictation] Retrying injection on start:', chrome.runtime.lastError.message);
+            chrome.scripting.executeScript({ target: { tabId: targetTab.id }, files: ['content.js'] }, () => {
+                chrome.tabs.sendMessage(targetTab.id, { action: startAction });
+            });
+        }
+    });
 }

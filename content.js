@@ -158,9 +158,9 @@
 
         let btn = await waitForChatGPTDictateButton(2500);
 
-        if (!btn && autoRepairEnabled) {
+        if (!btn) {
             btn = smartAutoDetectMicButton();
-            if (btn) {
+            if (btn && autoRepairEnabled) {
                 const newSel = generateUniqueSelector(btn);
                 CHATGPT.DICTATE_BUTTON_CANDIDATES = [newSel, ...CHATGPT_DEFAULTS.DICTATE_BUTTON_CANDIDATES];
                 chrome.storage.local.set({ sel_cg_mic: newSel });
