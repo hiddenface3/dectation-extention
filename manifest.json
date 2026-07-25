@@ -48,5 +48,16 @@
                 "styles.css"
             ]
         }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "start.mp3",
+                "stop.mp3"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
     ]
 }

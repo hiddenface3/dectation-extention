@@ -147,6 +147,15 @@
         element.click();
     }
 
+    function playAudio(filename) {
+        try {
+            const url = chrome.runtime.getURL(filename);
+            const a = new Audio(url);
+            a.volume = 0.85;
+            a.play().catch(e => console.warn('[Dictation] Audio error:', e));
+        } catch(e) {}
+    }
+
     // ─── CHATGPT ─────────────────────────────────────────────────────────────
     async function chatGptStart() {
         const el = document.querySelector(CHATGPT.TEXT_FIELD);
@@ -170,6 +179,7 @@
 
         if (btn) {
             triggerSyntheticClick(btn);
+            playAudio('start.mp3');
             showToast('ChatGPT Listening...');
             return { success: true };
         }
@@ -179,6 +189,7 @@
     }
 
     async function chatGptStop() {
+        playAudio('stop.mp3');
         let text = getTextFromField(CHATGPT.TEXT_FIELD);
         const submitBtn = document.querySelector(CHATGPT.SUBMIT_BUTTON);
         if (submitBtn) triggerSyntheticClick(submitBtn);
@@ -234,6 +245,7 @@
 
         if (btn) {
             triggerSyntheticClick(btn);
+            playAudio('start.mp3');
             showToast('Grok Listening...');
             return { success: true };
         }
@@ -243,6 +255,7 @@
     }
 
     async function grokStop() {
+        playAudio('stop.mp3');
         let text = getTextFromField(GROK.TEXT_FIELD);
         const confirmBtn = document.querySelector(GROK.CONFIRM_BUTTON) || document.querySelector('button[aria-label*="confirm" i]');
         if (confirmBtn) {
@@ -286,6 +299,7 @@
 
         if (btn) {
             triggerSyntheticClick(btn);
+            playAudio('start.mp3');
             showToast('Gemini Listening...');
             return { success: true };
         }
@@ -295,6 +309,7 @@
     }
 
     async function geminiStop() {
+        playAudio('stop.mp3');
         let text = getTextFromField(GEMINI.TEXT_FIELD);
         let stopBtn = findGeminiStopButton();
         if (stopBtn) {
