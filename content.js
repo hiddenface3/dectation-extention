@@ -179,11 +179,15 @@
     }
 
     async function chatGptStop() {
+        let text = getTextFromField(CHATGPT.TEXT_FIELD);
         const submitBtn = document.querySelector(CHATGPT.SUBMIT_BUTTON);
         if (submitBtn) triggerSyntheticClick(submitBtn);
 
-        await delay(500);
-        const text = await pollForText(CHATGPT.TEXT_FIELD);
+        if (!text) {
+            await delay(300);
+            text = await pollForText(CHATGPT.TEXT_FIELD);
+        }
+
         if (text) {
             await copyAndPaste(text, CHATGPT.WINDOW_TITLE);
             return { success: true, text };
@@ -239,14 +243,19 @@
     }
 
     async function grokStop() {
+        let text = getTextFromField(GROK.TEXT_FIELD);
         const confirmBtn = document.querySelector(GROK.CONFIRM_BUTTON) || document.querySelector('button[aria-label*="confirm" i]');
         if (confirmBtn) {
             triggerSyntheticClick(confirmBtn);
         } else {
             showToast('Confirm button not found — reading text anyway...');
         }
-        await delay(700);
-        const text = await pollForGrokText();
+
+        if (!text) {
+            await delay(400);
+            text = await pollForGrokText();
+        }
+
         if (text) {
             await copyAndPaste(text, GROK.WINDOW_TITLE);
             return { success: true, text };
@@ -256,9 +265,8 @@
 
     async function pollForGrokText() {
         for (let i = 0; i < 20; i++) {
-            await delay(500);
-            const el = document.querySelector(GROK.TEXT_FIELD);
-            const text = el ? (el.innerText || el.textContent || '').trim() : '';
+            await delay(400);
+            const text = getTextFromField(GROK.TEXT_FIELD);
             if (text.length > 0) return text;
         }
         return null;
@@ -287,6 +295,7 @@
     }
 
     async function geminiStop() {
+        let text = getTextFromField(GEMINI.TEXT_FIELD);
         let stopBtn = findGeminiStopButton();
         if (stopBtn) {
             triggerSyntheticClick(stopBtn);
@@ -296,8 +305,11 @@
             if (confirmBtn) triggerSyntheticClick(confirmBtn);
         }
 
-        await delay(800);
-        const text = await pollForText(GEMINI.TEXT_FIELD);
+        if (!text) {
+            await delay(400);
+            text = await pollForText(GEMINI.TEXT_FIELD);
+        }
+
         if (text) {
             await copyAndPaste(text, GEMINI.WINDOW_TITLE);
             return { success: true, text };
@@ -561,21 +573,42 @@
     }
 
     // ─── SHARED HELPERS ──────────────────────────────────────────────────────
+    function getTextFromField(selector) {
+        let el = null;
+        try { if (selector) el = document.querySelector(selector); } catch(e) {}
+        if (!el) el = smartAutoDetectTextField();
+        return el ? (el.innerText || el.value || el.textContent || '').trim() : '';
+    }
+
     async function copyAndPaste(text, windowTitle) {
+        let copied = false;
         try {
             await navigator.clipboard.writeText(text);
-            showToast('Copied! Pasting...');
-            chrome.runtime.sendMessage({ action: 'TEXT_COPIED', text, windowTitle });
+            copied = true;
         } catch (err) {
-            showToast('Copy failed.');
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                copied = document.execCommand('copy');
+                document.body.removeChild(ta);
+            } catch(e) {}
         }
+        showToast(copied ? 'Copied! Pasting...' : 'Pasting text...');
+        chrome.runtime.sendMessage({ action: 'TEXT_COPIED', text, windowTitle });
     }
 
     async function pollForText(selector) {
-        for (let i = 0; i < 20; i++) {
-            await delay(500);
-            const el = document.querySelector(selector);
-            const text = el ? (el.innerText || el.value || el.textContent || '').trim() : '';
+        let text = getTextFromField(selector);
+        if (text.length > 0) return text;
+
+        for (let i = 0; i < 15; i++) {
+            await delay(300);
+            text = getTextFromField(selector);
             if (text.length > 0) return text;
         }
         return null;
