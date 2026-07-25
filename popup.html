@@ -1,45 +1,226 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dictation Automator</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      width: 200px;
-      padding: 15px;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f7f7f8;
-      color: #333;
-      text-align: center;
+      width: 300px;
+      padding: 16px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      -webkit-font-smoothing: antialiased;
     }
 
-    h2 {
-      margin-top: 0;
-      font-size: 16px;
-      color: #444;
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #1e293b;
     }
 
-    .status {
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-icon {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+    }
+
+    .title-group h2 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f8fafc;
+      line-height: 1.2;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+
+    .status-badge.active {
+      color: #10b981;
+    }
+
+    .status-badge.active::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    .status-badge.inactive::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #64748b;
+    }
+
+    .icon-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: #334155;
+      color: #f8fafc;
+      border-color: #475569;
+    }
+
+    /* Master Switch Card */
+    .master-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .master-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    /* Buttons Container */
+    .btn-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .action-btn {
+      width: 100%;
+      border: none;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-weight: 600;
       font-size: 12px;
-      margin-bottom: 10px;
-      font-weight: bold;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
 
-    .status.active {
-      color: #10a37f;
+    .btn-autofix {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: white;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
+    }
+    .btn-autofix:hover {
+      background: linear-gradient(135deg, #0369a1, #075985);
     }
 
-    .status.inactive {
-      color: #888;
+    .btn-pick {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
+    }
+    .btn-pick:hover {
+      background: linear-gradient(135deg, #059669, #047857);
     }
 
-    /* Toggle Switch */
+    .action-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Settings Group Container */
+    .settings-group {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 6px 12px;
+      margin-bottom: 12px;
+    }
+
+    .row-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #334155;
+    }
+
+    .row-item:last-child {
+      border-bottom: none;
+    }
+
+    .row-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .select-dropdown {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #f8fafc;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-family: inherit;
+      outline: none;
+      max-width: 140px;
+    }
+
+    /* Modern Toggle Switches */
     .switch {
       position: relative;
       display: inline-block;
-      width: 60px;
-      height: 34px;
-      margin-bottom: 10px;
+      width: 38px;
+      height: 22px;
+      flex-shrink: 0;
     }
 
     .switch input {
@@ -55,105 +236,137 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: #ccc;
-      -webkit-transition: .4s;
-      transition: .4s;
-      border-radius: 34px;
+      background-color: #475569;
+      transition: .25s ease;
+      border-radius: 22px;
     }
 
     .slider:before {
       position: absolute;
       content: "";
-      height: 26px;
-      width: 26px;
-      left: 4px;
-      bottom: 4px;
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
       background-color: white;
-      -webkit-transition: .4s;
-      transition: .4s;
+      transition: .25s ease;
       border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
 
-    input:checked+.slider {
-      background-color: #10a37f;
+    input:checked + .slider {
+      background-color: #10b981;
     }
 
-    input:focus+.slider {
-      box-shadow: 0 0 1px #10a37f;
+    input:checked + .slider:before {
+      transform: translateX(16px);
     }
 
-    input:checked+.slider:before {
-      -webkit-transform: translateX(26px);
-      -ms-transform: translateX(26px);
-      transform: translateX(26px);
-    }
-
+    /* Footer */
     .footer {
-      font-size: 10px;
-      color: #666;
-      margin-top: 10px;
-      border-top: 1px solid #ddd;
-      padding-top: 5px;
+      font-size: 11px;
+      color: #94a3b8;
+      text-align: center;
+      padding-top: 4px;
+      line-height: 1.4;
     }
 
-    .settings-btn {
-      background: none;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      padding: 4px 8px;
-      color: #666;
-      float: right;
-      margin-top: -2px;
-      transition: background .2s, border-color .2s;
-    }
-    .settings-btn:hover {
-      background: #eee;
-      border-color: #aaa;
+    kbd {
+      background: #334155;
+      color: #f8fafc;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 11px;
+      border: 1px solid #475569;
     }
   </style>
 </head>
 
 <body>
-  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
-    <h2 style="margin:0;">Dictation Control</h2>
-    <button class="settings-btn" id="openSettings" title="Selector Settings">⚙️</button>
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-icon">🎙️</div>
+      <div class="title-group">
+        <h2>Dictation Control</h2>
+        <div id="statusText" class="status-badge inactive">Inactive</div>
+      </div>
+    </div>
+    <button class="icon-btn" id="openSettings" title="Open Selector Settings">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"></path>
+        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path>
+      </svg>
+    </button>
   </div>
-  <div id="statusText" class="status inactive">Inactive</div>
 
-  <label class="switch">
-    <input type="checkbox" id="toggleSwitch">
-    <span class="slider"></span>
-  </label>
-  <div style="margin-top: 15px; font-size: 13px; text-align: left;">
-    <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-      Auto-Paste (Browser)
-      <label class="switch" style="transform: scale(0.7); margin-bottom: 0;">
+  <!-- Master Toggle Card -->
+  <div class="master-card">
+    <span class="master-title">Extension Enabled</span>
+    <label class="switch">
+      <input type="checkbox" id="toggleSwitch">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="btn-container">
+    <button class="action-btn btn-autofix" id="btnAutoFixPage" title="Automatically scan and fix mic, text & submit selectors on current page">
+      🤖 Auto-Repair Current Page
+    </button>
+
+    <button class="action-btn btn-pick" id="btnPickVisual" title="Click to interactively select mic button on webpage">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"></circle>
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path>
+      </svg>
+      Pick Mic Button Visually
+    </button>
+  </div>
+
+  <!-- Options List -->
+  <div class="settings-group">
+    <div class="row-item" title="Select target AI service for dictation shortcut">
+      <span class="row-label">🎯 Target Service</span>
+      <select id="targetServiceSelect" class="select-dropdown">
+        <option value="chatgpt">ChatGPT</option>
+        <option value="grok">Grok</option>
+        <option value="gemini">Google Gemini</option>
+        <option value="active_tab">Current Active Tab</option>
+      </select>
+    </div>
+
+    <div class="row-item" title="Automatically attempt to repair broken selectors on dictation error">
+      <span class="row-label">🤖 Auto-Repair Selectors</span>
+      <label class="switch">
+        <input type="checkbox" id="autoRepairToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="row-item">
+      <span class="row-label">🌐 Auto-Paste (Browser)</span>
+      <label class="switch">
         <input type="checkbox" id="autoPasteBrowser">
         <span class="slider"></span>
       </label>
-    </label>
-    <label style="display: flex; align-items: center; justify-content: space-between;" title="Requires Native App installed">
-      Auto-Paste (Global Desktop)
-      <label class="switch" style="transform: scale(0.7); margin-bottom: 0;">
+    </div>
+
+    <div class="row-item" title="Requires Native App installed">
+      <span class="row-label">💻 Auto-Paste (Desktop)</span>
+      <label class="switch">
         <input type="checkbox" id="autoPasteGlobal">
         <span class="slider"></span>
       </label>
-    </label>
-    <hr style="border: none; border-top: 1px solid #ddd; margin: 10px 0;">
-    <label style="display: flex; align-items: center; justify-content: space-between;" title="Use Grok.com for dictation instead of ChatGPT">
-      <span>🎙️ Use Grok Dictation</span>
-      <label class="switch" style="transform: scale(0.7); margin-bottom: 0;">
-        <input type="checkbox" id="grokDictation">
-        <span class="slider"></span>
-      </label>
-    </label>
+    </div>
   </div>
 
+  <!-- Footer -->
   <div class="footer">
-    Shortcut: <strong>Ctrl + Alt</strong><br>
-    Works on any tab.
+    Shortcut: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd><br>
+    Works globally on any tab.
   </div>
 
   <script src="popup.js"></script>

@@ -7,13 +7,63 @@
     background-color: #333;
     color: white;
     padding: 10px 20px;
-    border-radius: 5px;
-    z-index: 10001;
+    border-radius: 6px;
+    z-index: 999999;
     opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
     pointer-events: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 #dictation-toast.show {
     opacity: 1;
 }
+
+/* Visual Element Picker Highlight Box */
+#dictation-picker-highlight {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999990;
+    border: 2px solid #10a37f;
+    background-color: rgba(16, 163, 127, 0.15);
+    box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.3), 0 0 15px rgba(16, 163, 127, 0.4);
+    border-radius: 4px;
+    transition: all 0.05s ease-out;
+}
+
+/* Visual Picker Top Banner */
+#dictation-picker-banner {
+    position: fixed;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999999;
+    background-color: #10a37f;
+    color: white;
+    padding: 10px 24px;
+    border-radius: 30px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#dictation-picker-banner .btn-cancel {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.2s;
+}
+
+#dictation-picker-banner .btn-cancel:hover {
+    background: rgba(255,255,255,0.4);
+}

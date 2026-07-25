@@ -1,24 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Dictation Automator – Settings</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     :root {
-      --bg:        #0f1117;
-      --surface:   #1a1d27;
-      --surface2:  #22263a;
-      --border:    #2e3250;
-      --accent:    #6c63ff;
-      --accent2:   #10b981;
-      --text:      #e8eaf6;
-      --muted:     #7b82a8;
-      --danger:    #ef4444;
-      --radius:    12px;
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3250;
+      --accent: #6c63ff;
+      --accent2: #10b981;
+      --text: #e8eaf6;
+      --muted: #7b82a8;
+      --danger: #ef4444;
+      --radius: 12px;
     }
 
     body {
@@ -36,242 +43,53 @@
       gap: 14px;
       margin-bottom: 36px;
     }
+
     .header-icon {
-      width: 44px; height: 44px;
+      width: 44px;
+      height: 44px;
       background: linear-gradient(135deg, var(--accent), #9c55ff);
       border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 22px;
-      box-shadow: 0 4px 20px rgba(108,99,255,.4);
+      box-shadow: 0 4px 20px rgba(108, 99, 255, .4);
     }
-    .header h1 { font-size: 22px; font-weight: 700; }
-    .header p  { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
 
     /* ── Service cards ── */
-    .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width: 640px) { .cards { grid-template-columns: 1fr; } }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 22px;
-      position: relative;
-      overflow: hidden;
-    }
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-    }
-    .card.chatgpt::before { background: linear-gradient(90deg, #10b981, #059669); }
-    .card.grok::before    { background: linear-gradient(90deg, #6c63ff, #9c55ff); }
-
-    .card-header {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 20px;
-    }
-    .card-badge {
-      width: 34px; height: 34px; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-    }
-    .chatgpt .card-badge { background: rgba(16,185,129,.15); }
-    .grok .card-badge    { background: rgba(108,99,255,.15); }
-
-    .card-title { font-size: 16px; font-weight: 600; }
-    .card-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-    /* ── Field groups ── */
-    .field { margin-bottom: 16px; }
-    .field:last-child { margin-bottom: 0; }
-
-    label {
-      display: block;
-      font-size: 12px; font-weight: 600;
-      color: var(--muted);
-      letter-spacing: .4px;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-    .field-desc {
-      font-size: 11px; color: var(--muted);
-      margin-bottom: 6px; line-height: 1.4;
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
     }
 
-    textarea {
-      width: 100%;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-family: 'Consolas', 'Monaco', monospace;
-      font-size: 11px;
-      line-height: 1.5;
-      padding: 10px 12px;
-      resize: vertical;
-      min-height: 68px;
-      outline: none;
-      transition: border-color .2s;
-    }
-    textarea:focus { border-color: var(--accent); }
-    textarea::placeholder { color: #4a4f6a; }
-
-    /* status indicator dot next to label */
-    .label-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .label-row label { margin-bottom: 0; }
-    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
-    .dot.ok  { background: var(--accent2); }
-    .dot.err { background: var(--danger); }
-
-    /* ── Actions ── */
-    .actions {
-      display: flex; gap: 12px; margin-top: 28px;
-      justify-content: flex-end;
+    .card.chatgpt::before {
+      background: linear-gradient(90deg, #10b981, #059669);
     }
 
-    .btn {
-      padding: 10px 24px;
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 14px; font-weight: 600;
-      cursor: pointer; border: none;
-      transition: transform .1s, box-shadow .2s;
+    .card.grok::before {
+      background: linear-gradient(90deg, #6c63ff, #9c55ff);
     }
-    .btn:active { transform: scale(.97); }
 
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #9c55ff);
-      color: #fff;
-      box-shadow: 0 4px 16px rgba(108,99,255,.35);
+    .card.gemini::before {
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
     }
-    .btn-primary:hover { box-shadow: 0 4px 24px rgba(108,99,255,.55); }
 
-    .btn-ghost {
-      background: var(--surface2);
-      color: var(--muted);
-      border: 1px solid var(--border);
+    .gemini .card-badge {
+      background: rgba(59, 130, 246, .15);
     }
-    .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
 
-    /* ── Toast ── */
-    .toast {
-      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-      background: #1e2235;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 10px 20px;
-      border-radius: 100px;
-      font-size: 13px;
-      opacity: 0; pointer-events: none;
-      transition: opacity .3s;
-      white-space: nowrap;
-    }
-    .toast.show { opacity: 1; }
-    .toast.success { border-color: var(--accent2); color: var(--accent2); }
-    .toast.error   { border-color: var(--danger);  color: var(--danger); }
+    /* ── Gemini Card ── */
 
-    /* ── Info box ── */
-    .info-box {
-      background: rgba(108,99,255,.08);
-      border: 1px solid rgba(108,99,255,.25);
-      border-radius: 10px;
-      padding: 14px 16px;
-      font-size: 12px;
-      line-height: 1.6;
-      color: var(--muted);
-      margin-bottom: 28px;
-    }
-    .info-box strong { color: var(--text); }
-  </style>
-</head>
-<body>
-
-  <div class="header">
-    <div class="header-icon">⚙️</div>
-    <div>
-      <h1>Selector Settings</h1>
-      <p>Paste updated CSS selectors when the AI site changes its UI</p>
-    </div>
-  </div>
-
-  <div class="info-box">
-    <strong>How to get a selector:</strong> Right-click the button/field on ChatGPT or Grok →
-    <em>Inspect</em> → Right-click the highlighted element →
-    <em>Copy → Copy selector</em>. Paste it below and save.
-    Leave a field blank to use the built-in default.
-  </div>
-
-  <div class="cards">
-
-    <!-- ── ChatGPT ── -->
-    <div class="card chatgpt">
-      <div class="card-header">
-        <div class="card-badge">🤖</div>
-        <div>
-          <div class="card-title">ChatGPT</div>
-          <div class="card-sub">chatgpt.com selectors</div>
-        </div>
-      </div>
-
-      <div class="field">
-        <div class="label-row"><span class="dot" id="dot-cg-mic"></span><label for="cg-mic">Microphone / Dictate Button</label></div>
-        <div class="field-desc">The button that starts the voice dictation.</div>
-        <textarea id="cg-mic" placeholder="e.g.  button[aria-label=&quot;Dictate button&quot;]  — leave blank for default"></textarea>
-      </div>
-
-      <div class="field">
-        <div class="label-row"><span class="dot" id="dot-cg-submit"></span><label for="cg-submit">Submit / Confirm Button</label></div>
-        <div class="field-desc">Clicked to finish recording and submit the text.</div>
-        <textarea id="cg-submit" placeholder="e.g.  button[aria-label=&quot;Submit dictation&quot;]  — leave blank for default"></textarea>
-      </div>
-
-      <div class="field">
-        <div class="label-row"><span class="dot" id="dot-cg-text"></span><label for="cg-text">Text / Input Field</label></div>
-        <div class="field-desc">The text area where the dictated transcript appears.</div>
-        <textarea id="cg-text" placeholder="e.g.  #prompt-textarea  — leave blank for default"></textarea>
-      </div>
-    </div>
-
-    <!-- ── Grok ── -->
-    <div class="card grok">
-      <div class="card-header">
-        <div class="card-badge">✨</div>
-        <div>
-          <div class="card-title">Grok</div>
-          <div class="card-sub">grok.com selectors</div>
-        </div>
-      </div>
-
-      <div class="field">
-        <div class="label-row"><span class="dot" id="dot-gk-mic"></span><label for="gk-mic">Microphone / Dictate Button</label></div>
-        <div class="field-desc">The button that starts voice input on Grok.</div>
-        <textarea id="gk-mic" placeholder="Paste Grok mic button selector — leave blank for default"></textarea>
-      </div>
-
-      <div class="field">
-        <div class="label-row"><span class="dot" id="dot-gk-confirm"></span><label for="gk-confirm">Confirm / OK Button</label></div>
-        <div class="field-desc">Clicked after recording to accept the dictation.</div>
-        <textarea id="gk-confirm" placeholder="Paste Grok confirm button selector — leave blank for default"></textarea>
-      </div>
-
-      <div class="field">
-        <div class="label-row"><span class="dot" id="dot-gk-text"></span><label for="gk-text">Text / Input Field</label></div>
-        <div class="field-desc">The element that shows the recorded transcript.</div>
-        <textarea id="gk-text" placeholder="Paste Grok text field selector — leave blank for default"></textarea>
-      </div>
-    </div>
-
-  </div><!-- /cards -->
-
-  <div class="actions">
-    <button class="btn btn-ghost" id="btnReset">Reset to Defaults</button>
-    <button class="btn btn-primary" id="btnSave">Save Settings</button>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
-  <script src="settings.js"></script>
-</body>
-</html>
+    </div></div>< !-- ── Grok ── --><div class="card grok"><div class="card-header"><div class="card-badge">✨</div><div><div class="card-title">Grok</div><div class="card-sub">grok.com selectors</div></div></div><div class="field"><div class="label-row"><span class="dot" id="dot-gk-mic"></span><label for="gk-mic">Microphone / Dictate Button</label></div><div class="field-desc">The button that starts voice input on Grok.</div><textarea id="gk-mic" placeholder="Paste Grok mic button selector — leave blank for default"></textarea></div><div class="field"><div class="label-row"><span class="dot" id="dot-gk-confirm"></span><label for="gk-confirm">Confirm / OK Button</label></div><div class="field-desc">Clicked after recording to accept the dictation.</div><textarea id="gk-confirm" placeholder="Paste Grok confirm button selector — leave blank for default"></textarea></div><div class="field"><div class="label-row"><span class="dot" id="dot-gk-text"></span><label for="gk-text">Text / Input Field</label></div><div class="field-desc">The element that shows the recorded transcript.</div><textarea id="gk-text" placeholder="Paste Grok text field selector — leave blank for default"></textarea></div></div>< !-- ── Gemini ── --><div class="card gemini"><div class="card-header"><div class="card-badge">🌐</div><div><div class="card-title">Google Gemini</div><div class="card-sub">gemini.google.com selectors</div></div></div><div class="field"><div class="label-row"><span class="dot" id="dot-gm-mic"></span><label for="gm-mic">Microphone / Dictate Button</label></div><div class="field-desc">The microphone button on Gemini.</div><textarea id="gm-mic" placeholder="Paste Gemini mic button selector — leave blank for default"></textarea></div><div class="field"><div class="label-row"><span class="dot" id="dot-gm-confirm"></span><label for="gm-confirm">Submit / Send Button</label></div><div class="field-desc">Clicked after recording to submit prompt.</div><textarea id="gm-confirm" placeholder="Paste Gemini send button selector — leave blank for default"></textarea></div><div class="field"><div class="label-row"><span class="dot" id="dot-gm-text"></span><label for="gm-text">Text / Input Field</label></div><div class="field-desc">The text prompt box on Gemini.</div><textarea id="gm-text" placeholder="Paste Gemini text field selector — leave blank for default"></textarea></div></div></div>< !-- /cards --><div class="actions"><button class="btn btn-ghost" id="btnReset">Reset to Defaults</button><button class="btn btn-primary" id="btnSave">Save Settings</button></div><div class="toast" id="toast"></div><script src="settings.js"></script></body></html>

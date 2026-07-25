@@ -1,0 +1,88 @@
+================================================================================
+🚀 CHATGPT, GROK & GEMINI DICTATION AUTOMATOR — USER GUIDE & SETUP MANUAL 🚀
+================================================================================
+
+Welcome! This extension lets you trigger dictation seamlessly on ChatGPT, Grok, 
+Google Gemini, or ANY web page from anywhere using global keyboard shortcuts. 
+Follow this simple guide to set everything up in less than 2 minutes! ✨
+
+--------------------------------------------------------------------------------
+📦 STEP 1: INSTALLING THE EXTENSION IN YOUR BROWSER
+--------------------------------------------------------------------------------
+
+1️⃣ Open Microsoft Edge or Google Chrome.
+2️⃣ In the address bar, type one of the following and press Enter:
+   • Chrome: chrome://extensions
+   • Edge:   edge://extensions
+3️⃣ Turn ON "Developer mode" (top-right corner toggle switch ⚙️).
+4️⃣ Click the "Load unpacked" button (top-left).
+5️⃣ Select the folder containing this extension (`DECTATION - for edge cpy date13`).
+6️⃣ Done! 🎉 You will now see the "Dictation Automator Control" icon in your browser toolbar!
+
+--------------------------------------------------------------------------------
+⌨️ STEP 2: VERIFYING YOUR GLOBAL SHORTCUT
+--------------------------------------------------------------------------------
+
+• Default Shortcut:  Ctrl + Shift + Z  (Windows / Linux)
+• What it does:      Press ONCE to Start Listening 🎙️
+                     Press AGAIN to Stop & Copy/Paste 📝
+
+Need to change the keyboard shortcut?
+1️⃣ Go to `chrome://extensions/shortcuts` or `edge://extensions/shortcuts`.
+2️⃣ Scroll to "ChatGPT Dictation Automator".
+3️⃣ Click the pencil icon to set your preferred custom key combination!
+
+--------------------------------------------------------------------------------
+🎙️ STEP 3: HOW TO USE DICTATION (SUPPORTS CHATGPT, GROK, GEMINI & MORE)
+--------------------------------------------------------------------------------
+
+1️⃣ Open ChatGPT (`https://chatgpt.com`), Grok (`https://grok.com`), or Gemini (`https://gemini.google.com`).
+2️⃣ Select your target service in the Extension Popup dropdown:
+   • ChatGPT
+   • Grok
+   • Google Gemini
+   • Current Active Tab (runs directly on whatever site is open)
+3️⃣ Anywhere on your computer, press  Ctrl + Shift + Z .
+4️⃣ The browser will instantly focus the tab and start voice recording!
+5️⃣ Speak your prompt clearly into your microphone. 🗣️
+6️⃣ Press  Ctrl + Shift + Z  again when finished speaking.
+7️⃣ Your dictation text will be captured and copied to your clipboard! 📋
+
+--------------------------------------------------------------------------------
+🤖 STEP 4: ONE-CLICK AUTO-REPAIR PAGE BUTTON
+--------------------------------------------------------------------------------
+
+If any AI site updates its layout and dictation stops working:
+
+1️⃣ Open the AI site (ChatGPT, Grok, Gemini, etc.).
+2️⃣ Click the extension icon 🎙️ in your browser toolbar.
+3️⃣ Click the blue button:  🤖 Auto-Repair Current Page .
+4️⃣ The extension automatically scans the page's microphone button, text area, 
+   and send button, updates settings, and saves them! ✅
+
+--------------------------------------------------------------------------------
+🎯 STEP 5: FIXING BUTTONS VISUALLY (VISUAL ELEMENT PICKER)
+--------------------------------------------------------------------------------
+
+If you want to manually pick the exact microphone button:
+
+1️⃣ Click the extension icon 🎙️ in your browser toolbar.
+2️⃣ Click the green button:  🎯 Pick Mic Button Visually .
+3️⃣ Your mouse cursor on the webpage will turn into an interactive picker!
+4️⃣ Hover over the Microphone / Dictate button (a glowing teal box will follow).
+5️⃣ Click the microphone button ONCE on screen.
+6️⃣ Boom! ✅ A toast notification will say "Mic button saved!".
+
+--------------------------------------------------------------------------------
+❓ TROUBLESHOOTING & HELPFUL TIPS
+--------------------------------------------------------------------------------
+
+❌ Problem: "Dictate button not found" toast appears.
+👉 Fix: Click "🤖 Auto-Repair Current Page" or "🎯 Pick Mic Button Visually" in the popup.
+
+❌ Problem: Dictation starts but text isn't pasting into your other app.
+👉 Fix: Make sure "Auto-Paste (Browser)" or "Auto-Paste (Desktop)" is checked in the extension popup.
+
+================================================================================
+🎉 YOU'RE ALL SET! ENJOY SEAMLESS VOICE DICTATION ON ANY AI SITE! 🚀
+================================================================================
