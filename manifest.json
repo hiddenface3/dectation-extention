@@ -9,7 +9,8 @@
         "clipboardWrite",
         "tabs",
         "storage",
-        "nativeMessaging"
+        "nativeMessaging",
+        "offscreen"
     ],
     "host_permissions": [
         "<all_urls>"
@@ -53,7 +54,9 @@
         {
             "resources": [
                 "start.mp3",
-                "stop.mp3"
+                "stop.mp3",
+                "offscreen.html",
+                "offscreen.js"
             ],
             "matches": [
                 "<all_urls>"

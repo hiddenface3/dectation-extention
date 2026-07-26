@@ -8,19 +8,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const autoRepairToggle = document.getElementById('autoRepairToggle');
     const autoPasteBrowser = document.getElementById('autoPasteBrowser');
     const autoPasteGlobal = document.getElementById('autoPasteGlobal');
+    const pipNotchToggle = document.getElementById('pipNotchToggle');
     const targetServiceSelect = document.getElementById('targetServiceSelect');
     const btnAutoFixPage = document.getElementById('btnAutoFixPage');
     const btnPickVisual = document.getElementById('btnPickVisual');
     const statusText = document.getElementById('statusText');
 
     // 1. Load saved state
-    chrome.storage.local.get(['extensionEnabled', 'autoRepairEnabled', 'autoPasteBrowser', 'autoPasteGlobal', 'targetService', 'grokDictation'], (result) => {
+    chrome.storage.local.get(['extensionEnabled', 'autoRepairEnabled', 'autoPasteBrowser', 'autoPasteGlobal', 'usePipNotch', 'targetService', 'grokDictation'], (result) => {
         const isEnabled = result.extensionEnabled !== false;
 
         toggleSwitch.checked = isEnabled;
         autoRepairToggle.checked = result.autoRepairEnabled === true;
         autoPasteBrowser.checked = result.autoPasteBrowser === true;
         autoPasteGlobal.checked = result.autoPasteGlobal === true;
+        pipNotchToggle.checked = result.usePipNotch !== false; // Default ON on pro-visual branch
 
         if (result.targetService) {
             targetServiceSelect.value = result.targetService;
@@ -92,6 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     autoPasteGlobal.addEventListener('change', () => {
         chrome.storage.local.set({ autoPasteGlobal: autoPasteGlobal.checked });
+    });
+
+    pipNotchToggle.addEventListener('change', () => {
+        chrome.storage.local.set({ usePipNotch: pipNotchToggle.checked });
     });
 
     targetServiceSelect.addEventListener('change', () => {

@@ -1,5 +1,32 @@
-// Background Script — Dictation Automator
-// Handles routing shortcut to ChatGPT, Grok, Gemini, or Active Tab, and OS-level paste.
+// Background Script — Dictation Automator (Pro Visual Branch)
+// Handles routing shortcut to ChatGPT, Grok, Gemini, or Active Tab, OS-level paste, and Floating PiP Wave Notch.
+
+// ─── OFFSCREEN & PIP NOTCH MANAGER ─────────────────────────────────────────
+async function setupOffscreenDocument() {
+    if (typeof chrome.offscreen === 'undefined') return;
+    if (await chrome.offscreen.hasDocument()) return;
+    try {
+        await chrome.offscreen.createDocument({
+            url: 'offscreen.html',
+            reasons: ['USER_MEDIA'],
+            justification: 'Record microphone audio and display floating visualizer notch'
+        });
+    } catch (e) {
+        console.warn('[Background] Offscreen doc warning:', e);
+    }
+}
+
+async function triggerPiPNotch(start = true) {
+    const { usePipNotch } = await chrome.storage.local.get(['usePipNotch']);
+    if (usePipNotch === false) return;
+
+    await setupOffscreenDocument();
+    chrome.runtime.sendMessage({ action: start ? 'START_NOTCH' : 'STOP_NOTCH' }, () => {
+        if (chrome.runtime.lastError) {
+            // Ignore if offscreen doc listener is busy
+        }
+    });
+}
 
 // ─── HELPER: STATE MANAGEMENT (Persistent across MV3 Service Worker suspensions) ───
 async function getRecordingState() {
@@ -19,7 +46,7 @@ async function setRecordingState(isRecording, activeServiceTab = null, currentSt
 chrome.commands.onCommand.addListener(async (command) => {
     if (command !== 'toggle-dictation') return;
 
-    const { targetService, grokDictation, extensionEnabled } = await chrome.storage.local.get(['targetService', 'grokDictation', 'extensionEnabled']);
+    const { targetService, extensionEnabled } = await chrome.storage.local.get(['targetService', 'extensionEnabled']);
     if (extensionEnabled === false) return;
 
     const state = await getRecordingState();
@@ -37,6 +64,8 @@ chrome.commands.onCommand.addListener(async (command) => {
 
     if (state.isRecording) {
         // ── STOP dictation ──────────────────────────────────────────────────
+        triggerPiPNotch(false);
+
         let targetTabId = state.activeServiceTab || activeTab?.id;
         if (targetTabId) {
             chrome.tabs.sendMessage(targetTabId, { action: state.currentStopAction }, () => {
@@ -48,6 +77,7 @@ chrome.commands.onCommand.addListener(async (command) => {
         await setRecordingState(false, null, 'STOP_DICTATION');
     } else {
         // ── START dictation ─────────────────────────────────────────────────
+        triggerPiPNotch(true);
         await handleSwitchAndStart(service);
     }
 });
@@ -55,10 +85,12 @@ chrome.commands.onCommand.addListener(async (command) => {
 // ─── MESSAGE HANDLER ─────────────────────────────────────────────────────────
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.action === 'TEXT_COPIED') {
+        triggerPiPNotch(false);
         await setRecordingState(false, null, 'STOP_DICTATION');
         nativeMessage({ action: 'paste', text: message.text, windowTitle: message.windowTitle || '' });
     }
     if (message.action === 'DICTATION_FAILED') {
+        triggerPiPNotch(false);
         await setRecordingState(false, null, 'STOP_DICTATION');
     }
 });
